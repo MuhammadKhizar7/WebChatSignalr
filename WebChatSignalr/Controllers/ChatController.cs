@@ -28,7 +28,7 @@ namespace WebChatSignalr.Controllers
             var connectedRooms = await _dbContext.Rooms
                 .Include(x=>x.User)
                 .Include(x=>x.Creator)
-                .Where(x => x.CreatorId == loginUserId || x.UserId == loginUserId && x.IsBlocked==false)
+                .Where(x => (x.CreatorId == loginUserId || x.UserId == loginUserId) && !x.IsBlocked)
                 .Select(x=> new RoomViewModel
                 {
                     Id = x.Id,
@@ -50,11 +50,22 @@ namespace WebChatSignalr.Controllers
                 })
                 .OrderBy(x=>x.UpdatedDate)
                 .ToListAsync();
+
+            var conversation = new ConversationViewModel();
             if (id != null && await _dbContext.Rooms.AnyAsync(x=>x.CreatorId==id || x.UserId==id))
             {
-                // var currentRoom = connectedRooms.First(x => x.CreatorId == id || x.UserId == id);
-                // var messages =await _dbContext.Messages.Where(x => x.RoomId == currentRoom.Id).ToListAsync();
-                // currentRoom.Messages = messages;
+                var currentRoom = connectedRooms.First(x => x.Sender.Id == id || x.Recipient.Id == id);
+                conversation.Sender = currentRoom.Sender;
+                conversation.Recipient = currentRoom.Recipient;
+                conversation.Messages = await _dbContext.Messages
+                    .Where(x => x.RoomId == currentRoom.Id)
+                    .Select(x=> new MessageViewModel
+                    {
+                        Id = x.Id,
+                        Content =x.Content,
+                        SenderId = x.UserId,
+                        Timestamp = x.Timestamp
+                    }).ToListAsync();
             }
             else if (id != null && await _dbContext.Users.AnyAsync(x=>x.Id == id))
             {
@@ -67,12 +78,36 @@ namespace WebChatSignalr.Controllers
 
                await _dbContext.Rooms.AddAsync(newRoom);
                await _dbContext.SaveChangesAsync();
+               var currentRoom =await _dbContext.Rooms
+                                                   .Include(x=>x.User)
+                                                   .Include(x=>x.Creator)
+                                                   .Select(x=> new RoomViewModel
+                                                   {
+                                                       Id = x.Id,
+                                                       Sender = new PersonViewModel
+                                                       {
+                                                           Id = (x.UserId != null && (x.UserId != loginUserId)) ? x.UserId : x.CreatorId,
+                                                           Name = (x.UserId != null && (x.UserId != loginUserId)) ? x.User.Name : x.Creator.Name,
+                                                           Avatar = (x.UserId != null && (x.UserId != loginUserId)) ? x.User.Avatar : x.Creator.Avatar
+                                                       },
+                                                       Recipient = new PersonViewModel
+                                                       {
+                                                           Id = (x.UserId != null && (x.UserId == loginUserId)) ? x.UserId : x.CreatorId,
+                                                           Name = (x.UserId != null && (x.UserId == loginUserId)) ? x.User.Name : x.Creator.Name,
+                                                           Avatar = (x.UserId != null && (x.UserId == loginUserId)) ? x.User.Avatar : x.Creator.Avatar
+                                                       },
+                                                       UpdatedDate = x.UpdatedDate,
+                                                   })
+                                                   .FirstOrDefaultAsync(x => x.Id == newRoom.Id);
+               conversation.Sender = currentRoom.Sender;
+               conversation.Recipient = currentRoom.Recipient;
+               connectedRooms.Add(currentRoom);
             }
 
             var chat = new ChatViewModel
             {
                 Rooms = connectedRooms,
-                Messages = new List<MessageViewModel>()
+                Conversation = conversation
             };
       
             return View(chat);

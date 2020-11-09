@@ -150,3 +150,6 @@ for details on configuring this project to bundle and minify static web assets. 
 .chat-pt {
     padding-top: 1.4rem !important;
 }
+a.active text-white-1 {
+    color: #ffffff;
+}
