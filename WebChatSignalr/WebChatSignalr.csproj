@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>aspnet-WebChatSignalr-5738A47A-6AEC-48FA-871C-683B6889EA37</UserSecretsId>
+    <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20201021143015_Initial.cs" />
+    <Compile Remove="Migrations\20201021143015_Initial.Designer.cs" />
+    <Compile Remove="Migrations\20201027175932_CreateUsersInRoom.cs" />
+    <Compile Remove="Migrations\20201027175932_CreateUsersInRoom.Designer.cs" />
+    <Compile Remove="Migrations\20201103140701_Initial.cs" />
+    <Compile Remove="Migrations\20201103140701_Initial.Designer.cs" />
+    <Compile Remove="Migrations\20201103140918_Initial.cs" />
+    <Compile Remove="Migrations\20201103140918_Initial.Designer.cs" />
+    <Compile Remove="Migrations\20201103141215_Initial.cs" />
+    <Compile Remove="Migrations\20201103141215_Initial.Designer.cs" />
+    <Compile Remove="Migrations\20201103141657_Initial.cs" />
+    <Compile Remove="Migrations\20201103141657_Initial.Designer.cs" />
+    <Compile Remove="Migrations\20201103142039_Initial.cs" />
+    <Compile Remove="Migrations\20201103142039_Initial.Designer.cs" />
+    <Compile Remove="Migrations\20201103142235_Initial.cs" />
+    <Compile Remove="Migrations\20201103142235_Initial.Designer.cs" />
+    <Compile Remove="Migrations\20201103142615_Initial.cs" />
+    <Compile Remove="Migrations\20201103142615_Initial.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="3.1.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="3.1.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="3.1.9" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Views\Rooms\Index.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Pages" />
+  </ItemGroup>
+
+</Project>

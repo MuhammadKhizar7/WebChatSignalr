@@ -1,0 +1,152 @@
+﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
+for details on configuring this project to bundle and minify static web assets. */
+
+/* a.navbar-brand { */
+/*   white-space: normal; */
+/*   text-align: center; */
+/*   word-break: break-all; */
+/* } */
+/* */
+/* /* Provide sufficient contrast against white background !1! */
+/* a { */
+/*   color: #0366d6; */
+/* } */
+/* */
+/* .btn-primary { */
+/*   color: #fff; */
+/*   background-color: #1b6ec2; */
+/*   border-color: #1861ac; */
+/* } */
+/* */
+/* .nav-pills .nav-link.active, .nav-pills .show > .nav-link { */
+/*   color: #fff; */
+/*   background-color: #1b6ec2; */
+/*   border-color: #1861ac; */
+/* } */
+/* */
+/* /* Sticky footer styles */
+/* -------------------------------------------------- */ 
+/* html { */
+/*   font-size: 14px; */
+/* } */
+/* @media (min-width: 768px) { */
+/*   html { */
+/*     font-size: 16px; */
+/*   } */
+/* } */
+/* */
+/* .border-top { */
+/*   border-top: 1px solid #e5e5e5; */
+/* } */
+/* .border-bottom { */
+/*   border-bottom: 1px solid #e5e5e5; */
+/* } */
+/* */
+.box-shadow {
+  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+/* button.accept-policy { */
+/*   font-size: 1rem; */
+/*   line-height: inherit; */
+/* } */
+/* */
+/* /* Sticky footer styles */
+/* -------------------------------------------------- */ 
+/* html { */
+/*   position: relative; */
+/*   min-height: 100%; */
+/* } */
+/* */
+/* body { */
+/*   /* Margin bottom by footer height !1! */
+/*   margin-bottom: 60px; */
+/* } */
+/* .footer { */
+/*   position: absolute; */
+/*   bottom: 0; */
+/*   width: 100%; */
+/*   white-space: nowrap; */
+/*   line-height: 60px; /* Vertically center the text there !1! */
+/* } */
+.profile-avatar, .profile-avatar > img {
+    height: 2.125rem;
+    min-height: 2.125rem;
+    width: 2.125rem;
+    min-width: 2.125rem;
+}
+
+    .profile-avatar, .profile-avatar > img {
+        -ms-border-radius: 50%;
+        border-radius: 50%;
+    }
+
+.profile-avatar {
+    background: #f5f6fa;
+    display: inline-block;
+    position: relative;
+    line-height: 0;
+}
+
+.badge-border-light {
+    border: 5px solid #f5f6fa;
+}
+
+.badge-top-right {
+    top: 0;
+    right: 0;
+    -webkit-transform: translate(25%,-25%);
+    -ms-transform: translate(25%,-25%);
+    transform: translate(25%,-25%);
+}
+
+.badge-circle {
+    position: relative;
+    -ms-border-radius: 50%;
+    border-radius: 50%;
+    padding: 0;
+    vertical-align: middle;
+    height: 1.75rem;
+    width: 1.75rem;
+    min-width: 1.75rem;
+}
+
+.badge-bottom-center, .badge-bottom-left, .badge-bottom-right, .badge-top-center, .badge-top-left, .badge-top-right {
+    position: absolute;
+    z-index: 1;
+}
+
+.mb-n6, .my-n6 {
+    margin-bottom: -1.25rem !important;
+}
+
+.badge-primary {
+    color: #fff;
+    /* background-color: #0176ff; */
+    background-color: #31d0d0;
+}
+.btn-search-ico {
+    color: rgba(33,37,41,.35);
+    fill: rgba(33,37,41,.35);
+    border: 1px solid #ced4da;
+    border-left-width: 0;
+}
+/* body { */
+/*     flex-direction: row; */
+/*     height: 100%; */
+/*     overflow: hidden; */
+/* } */
+.chat-box {
+    height: calc(100% - 100px);
+}
+.chat-area, .chat-sidebar {
+    height: calc(100vh - 80px) !important;
+    line-height: 0.9
+}
+.chat-upload {
+    border: 1px solid #ced4da;
+    border-right-width: 0;
+}
+.chat-pt {
+    padding-top: 1.4rem !important;
+}
