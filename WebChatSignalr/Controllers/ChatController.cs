@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -21,87 +20,115 @@ namespace WebChatSignalr.Controllers
         {
             _dbContext = dbContext;
         }
+
         // GET
         public async Task<IActionResult> Index(int? id)
         {
-            var  loginUserId = Convert.ToInt32(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var loginUserId = Convert.ToInt32(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var connectedRooms = await _dbContext.Rooms
-                .Include(x=>x.User)
-                .Include(x=>x.Creator)
+                .Include(x => x.User)
+                .Include(x => x.Creator)
                 .Where(x => (x.CreatorId == loginUserId || x.UserId == loginUserId) && !x.IsBlocked)
-                .Select(x=> new RoomViewModel
+                .Select(x => new RoomViewModel
                 {
                     Id = x.Id,
                     Sender = new PersonViewModel
                     {
-                        Id = (x.UserId != null && (x.UserId != loginUserId)) ? x.UserId : x.CreatorId,
-                        Name = (x.UserId != null && (x.UserId != loginUserId)) ? x.User.Name : x.Creator.Name,
-                        Avatar = (x.UserId != null && (x.UserId != loginUserId)) ? x.User.Avatar : x.Creator.Avatar
+                        Id = x.UserId != null && x.UserId != loginUserId ? x.UserId : x.CreatorId,
+                        Name = x.UserId != null && x.UserId != loginUserId ? x.User.Name : x.Creator.Name,
+                        Avatar = x.UserId != null && x.UserId != loginUserId ? x.User.Avatar : x.Creator.Avatar
                     },
                     Recipient = new PersonViewModel
                     {
-                        Id = (x.UserId != null && (x.UserId == loginUserId)) ? x.UserId : x.CreatorId,
-                        Name = (x.UserId != null && (x.UserId == loginUserId)) ? x.User.Name : x.Creator.Name,
-                        Avatar = (x.UserId != null && (x.UserId == loginUserId)) ? x.User.Avatar : x.Creator.Avatar
+                        Id = x.UserId != null && x.UserId == loginUserId ? x.UserId : x.CreatorId,
+                        Name = x.UserId != null && x.UserId == loginUserId ? x.User.Name : x.Creator.Name,
+                        Avatar = x.UserId != null && x.UserId == loginUserId ? x.User.Avatar : x.Creator.Avatar
                     },
                     UpdatedDate = x.UpdatedDate,
                     UnreadCount = x.UnreadCount,
-                    Excerpt = x.Messages.OrderByDescending(x=>x.Timestamp).FirstOrDefault().Content
+                    Excerpt = x.Messages.OrderByDescending(message => message.Timestamp).FirstOrDefault().Content
                 })
-                .OrderBy(x=>x.UpdatedDate)
+                .OrderBy(x => x.UpdatedDate)
                 .ToListAsync();
-
             var conversation = new ConversationViewModel();
-            if (id != null && await _dbContext.Rooms.AnyAsync(x=>x.CreatorId==id || x.UserId==id))
+            if (id != null && await _dbContext.Users.AnyAsync(x => x.Id == id))
             {
-                var currentRoom = connectedRooms.First(x => x.Sender.Id == id || x.Recipient.Id == id);
-                conversation.Sender = currentRoom.Sender;
-                conversation.Recipient = currentRoom.Recipient;
-                conversation.Messages = await _dbContext.Messages
-                    .Where(x => x.RoomId == currentRoom.Id)
-                    .Select(x=> new MessageViewModel
+                var currentRoom = await _dbContext.Rooms
+                    .Include(x => x.User)
+                    .Include(x => x.Creator)
+                    .Where(x => (x.CreatorId == loginUserId || x.UserId == loginUserId) && !x.IsBlocked)
+                    .Select(x => new RoomViewModel
                     {
                         Id = x.Id,
-                        Content =x.Content,
-                        SenderId = x.UserId,
-                        Timestamp = x.Timestamp
-                    }).ToListAsync();
-            }
-            else if (id != null && await _dbContext.Users.AnyAsync(x=>x.Id == id))
-            {
-                var newRoom = new Room
+                        Sender = new PersonViewModel
+                        {
+                            Id = x.UserId != null && x.UserId != loginUserId ? x.UserId : x.CreatorId,
+                            Name = x.UserId != null && x.UserId != loginUserId ? x.User.Name : x.Creator.Name,
+                            Avatar = x.UserId != null && x.UserId != loginUserId ? x.User.Avatar : x.Creator.Avatar
+                        },
+                        Recipient = new PersonViewModel
+                        {
+                            Id = x.UserId != null && x.UserId == loginUserId ? x.UserId : x.CreatorId,
+                            Name = x.UserId != null && x.UserId == loginUserId ? x.User.Name : x.Creator.Name,
+                            Avatar = x.UserId != null && x.UserId == loginUserId ? x.User.Avatar : x.Creator.Avatar
+                        },
+                        UpdatedDate = x.UpdatedDate,
+                        UnreadCount = x.UnreadCount,
+                        Excerpt = x.Messages.OrderByDescending(message => message.Timestamp).FirstOrDefault().Content
+                    })
+                    .FirstOrDefaultAsync(x => x.Sender.Id == id);
+                if (currentRoom == null)
                 {
-                    CreatorId = loginUserId,
-                    UserId = id,
-                    UpdatedDate = DateTime.Now
-                };
+                    var newRoom = new Room
+                    {
+                        CreatorId = loginUserId,
+                        UserId = id,
+                        UpdatedDate = DateTime.Now
+                    };
+                    await _dbContext.Rooms.AddAsync(newRoom);
+                    await _dbContext.SaveChangesAsync();
 
-               await _dbContext.Rooms.AddAsync(newRoom);
-               await _dbContext.SaveChangesAsync();
-               var currentRoom =await _dbContext.Rooms
-                                                   .Include(x=>x.User)
-                                                   .Include(x=>x.Creator)
-                                                   .Select(x=> new RoomViewModel
-                                                   {
-                                                       Id = x.Id,
-                                                       Sender = new PersonViewModel
-                                                       {
-                                                           Id = (x.UserId != null && (x.UserId != loginUserId)) ? x.UserId : x.CreatorId,
-                                                           Name = (x.UserId != null && (x.UserId != loginUserId)) ? x.User.Name : x.Creator.Name,
-                                                           Avatar = (x.UserId != null && (x.UserId != loginUserId)) ? x.User.Avatar : x.Creator.Avatar
-                                                       },
-                                                       Recipient = new PersonViewModel
-                                                       {
-                                                           Id = (x.UserId != null && (x.UserId == loginUserId)) ? x.UserId : x.CreatorId,
-                                                           Name = (x.UserId != null && (x.UserId == loginUserId)) ? x.User.Name : x.Creator.Name,
-                                                           Avatar = (x.UserId != null && (x.UserId == loginUserId)) ? x.User.Avatar : x.Creator.Avatar
-                                                       },
-                                                       UpdatedDate = x.UpdatedDate,
-                                                   })
-                                                   .FirstOrDefaultAsync(x => x.Id == newRoom.Id);
-               conversation.Sender = currentRoom.Sender;
-               conversation.Recipient = currentRoom.Recipient;
-               connectedRooms.Add(currentRoom);
+                    currentRoom = await _dbContext.Rooms
+                        .Include(x => x.User)
+                        .Include(x => x.Creator)
+                        .Select(x => new RoomViewModel
+                        {
+                            Id = x.Id,
+                            Sender = new PersonViewModel
+                            {
+                                Id = x.UserId != null && x.UserId != loginUserId ? x.UserId : x.CreatorId,
+                                Name = x.UserId != null && x.UserId != loginUserId ? x.User.Name : x.Creator.Name,
+                                Avatar = x.UserId != null && x.UserId != loginUserId ? x.User.Avatar : x.Creator.Avatar
+                            },
+                            Recipient = new PersonViewModel
+                            {
+                                Id = x.UserId != null && x.UserId == loginUserId ? x.UserId : x.CreatorId,
+                                Name = x.UserId != null && x.UserId == loginUserId ? x.User.Name : x.Creator.Name,
+                                Avatar = x.UserId != null && x.UserId == loginUserId ? x.User.Avatar : x.Creator.Avatar
+                            },
+                            UpdatedDate = x.UpdatedDate
+                        })
+                        .FirstOrDefaultAsync(x => x.Id == newRoom.Id);
+                    conversation.Id = currentRoom.Id.ToString();
+                    conversation.Sender = currentRoom.Sender;
+                    conversation.Recipient = currentRoom.Recipient;
+                    connectedRooms.Insert(0, currentRoom);
+                }
+                else
+                {
+                    conversation.Id = currentRoom.Id.ToString();
+                    conversation.Recipient = currentRoom.Recipient;
+                    conversation.Sender = currentRoom.Sender;
+                    conversation.Messages = await _dbContext.Messages
+                        .Where(x => x.RoomId == currentRoom.Id)
+                        .Select(x => new MessageViewModel
+                        {
+                            Id = x.RoomId,
+                            Content = x.Content,
+                            SenderId = x.UserId,
+                            Timestamp = x.Timestamp
+                        }).ToListAsync();
+                }
             }
 
             var chat = new ChatViewModel
@@ -109,13 +136,14 @@ namespace WebChatSignalr.Controllers
                 Rooms = connectedRooms,
                 Conversation = conversation
             };
-      
+
             return View(chat);
         }
+
         [HttpPost]
         public async Task<Room> CreateRoom(Room room)
         {
-            var roomx = new Room 
+            var roomx = new Room
             {
                 Name = "NewRoom",
                 CreatorId = 1,
@@ -125,36 +153,25 @@ namespace WebChatSignalr.Controllers
             await _dbContext.SaveChangesAsync();
             return roomx;
         }
+
         [HttpPost]
         public async Task<IActionResult> LeaveRoom(int roomId)
         {
-            var room = new Room 
+            var room = new Room
             {
                 Name = "NewRoom",
-                CreatorId = 1,
+                CreatorId = 1
             };
-             _dbContext.Rooms.Remove(room);
-             await _dbContext.SaveChangesAsync();
+            _dbContext.Rooms.Remove(room);
+            await _dbContext.SaveChangesAsync();
             return Json(room.Id);
         }
+
         [HttpGet]
         public async Task<IActionResult> LoadHistory(int roomId)
         {
-          // var messages = await _dbContext.Messages.Where(x => x.RoomId == roomId).ToListAsync();
-          var messages = new List<Message>
-          {
-              new Message
-              {
-                  Id = 1,
-                  Content = "Hello world",
-                  Timestamp = DateTime.Now,
-                  RoomId = 1,
-                  UserId = 1,
-
-              }
-          };
+            var messages = await _dbContext.Messages.Where(x => x.RoomId == roomId).ToListAsync();
             return Json(messages);
         }
-        
     }
 }

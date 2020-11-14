@@ -67,6 +67,12 @@
                     <div class="media-body">
                         <div class="d-flex mb-1">
                             <h6 class="text-truncate mb-0 mr-auto">@Model.Conversation.Sender.Name</h6>
+                            <input type="hidden" asp-for="Conversation.Sender.Id" />
+                            <input type="hidden" asp-for="Conversation.Sender.Name" />
+                            <input type="hidden" asp-for="Conversation.Sender.Avatar" />
+                            <input type="hidden" asp-for="Conversation.Recipient.Id" />
+                            <input type="hidden" asp-for="Conversation.Recipient.Name" />
+                            <input type="hidden" asp-for="Conversation.Recipient.Avatar" />
                             <div class="dropdown">
                                 <a class="btn dropdown-toggle" type="button" id="chatdrop" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 </a>
@@ -94,7 +100,7 @@
 
                                     <div class="media-body overflow-hidden">
                                         <div class="d-flex mb-1">
-                                            <h6 class="text-truncate mb-0 mr-auto">@Model.Conversation.Sender.Avatar</h6>
+                                            <h6 class="text-truncate mb-0 mr-auto">@Model.Conversation.Sender.Name</h6>
                                             <p class="small text-muted text-nowrap ml-4">@message.Timestamp</p>
                                         </div>
                                         <div class="text-wrap text-break">@message.Content</div>
@@ -112,7 +118,7 @@
 
                                     <div class="media-body overflow-hidden">
                                         <div class="d-flex mb-1">
-                                            <h6 class="text-truncate mb-0 mr-auto">@Model.Conversation.Recipient.Avatar</h6>
+                                            <h6 class="text-truncate mb-0 mr-auto">@Model.Conversation.Recipient.Name</h6>
                                             <p class="small text-muted text-nowrap ml-4">@message.Timestamp</p>
                                         </div>
                                         <div class="text-wrap text-break">@message.Content</div>
@@ -121,141 +127,6 @@
                             </li>
                         }
                     }
-                    @* <li> *@
-                    @*     <div class="media p-2 "> *@
-                    @*         <div class="profile-avatar mr-2"> *@
-                    @*             <img class="avatar-img" src="https://themes.2the.me/Messenger-1.1/assets/images/avatars/12.jpg" alt="Bootstrap Themes"> *@
-                    @*         </div> *@
-                    @* *@
-                    @*         <div class="media-body overflow-hidden"> *@
-                    @*             <div class="d-flex mb-1"> *@
-                    @*                 <h6 class="text-truncate mb-0 mr-auto">Bootstrap Themes</h6> *@
-                    @*                 <p class="small text-muted text-nowrap ml-4">10:42 am</p> *@
-                    @*             </div> *@
-                    @*             <div class="text-truncate">Anna Bridges: Hey, Maher! How are you? The weather is great isn't it?</div> *@
-                    @*         </div> *@
-                    @*     </div> *@
-                    @* </li> *@
-                    @* <li> *@
-                    @*     <div class="media p-2"> *@
-                    @*         <div class="profile-avatar mr-2"> *@
-                    @*             <img class="avatar-img" src="https://themes.2the.me/Messenger-1.1/assets/images/avatars/10.jpg" alt="Bootstrap Themes"> *@
-                    @*         </div> *@
-                    @* *@
-                    @*         <div class="media-body overflow-hidden"> *@
-                    @*             <div class="d-flex mb-1"> *@
-                    @*                 <h6 class="text-truncate mb-0 mr-auto">Bootstrap Themes</h6> *@
-                    @*                 <p class="small text-muted text-nowrap ml-4">10:42 am</p> *@
-                    @*             </div> *@
-                    @*             <div class="text-truncate">Anna Bridges: Hey, Maher! How are you? The weather is great isn't it?</div> *@
-                    @*         </div> *@
-                    @*     </div> *@
-                    @* </li> *@
-                    @* <li> *@
-                    @*     <div class="media p-2"> *@
-                    @*         <div class="profile-avatar mr-2"> *@
-                    @*             <img class="avatar-img" src="https://themes.2the.me/Messenger-1.1/assets/images/avatars/10.jpg" alt="Bootstrap Themes"> *@
-                    @*         </div> *@
-                    @* *@
-                    @*         <div class="media-body overflow-hidden"> *@
-                    @*             <div class="d-flex mb-1"> *@
-                    @*                 <h6 class="text-truncate mb-0 mr-auto">Bootstrap Themes</h6> *@
-                    @*                 <p class="small text-muted text-nowrap ml-4">10:42 am</p> *@
-                    @*             </div> *@
-                    @*             <div class="text-truncate">Anna Bridges: Hey, Maher! How are you? The weather is great isn't it?</div> *@
-                    @*         </div> *@
-                    @*     </div> *@
-                    @* </li> *@
-                    @* <li> *@
-                    @*     <div class="media p-2"> *@
-                    @*         <div class="profile-avatar mr-2"> *@
-                    @*             <img class="avatar-img" src="https://themes.2the.me/Messenger-1.1/assets/images/avatars/10.jpg" alt="Bootstrap Themes"> *@
-                    @*         </div> *@
-                    @* *@
-                    @*         <div class="media-body overflow-hidden"> *@
-                    @*             <div class="d-flex mb-1"> *@
-                    @*                 <h6 class="text-truncate mb-0 mr-auto">Bootstrap Themes</h6> *@
-                    @*                 <p class="small text-muted text-nowrap ml-4">10:42 am</p> *@
-                    @*             </div> *@
-                    @*             <div class="text-truncate">Anna Bridges: Hey, Maher! How are you? The weather is great isn't it?</div> *@
-                    @*         </div> *@
-                    @*     </div> *@
-                    @* </li> *@
-                    @* <li> *@
-                    @*     <div class="media p-2"> *@
-                    @*         <div class="profile-avatar mr-2"> *@
-                    @*             <img class="avatar-img" src="https://themes.2the.me/Messenger-1.1/assets/images/avatars/10.jpg" alt="Bootstrap Themes"> *@
-                    @*         </div> *@
-                    @* *@
-                    @*         <div class="media-body overflow-hidden"> *@
-                    @*             <div class="d-flex mb-1"> *@
-                    @*                 <h6 class="text-truncate mb-0 mr-auto">Bootstrap Themes</h6> *@
-                    @*                 <p class="small text-muted text-nowrap ml-4">10:42 am</p> *@
-                    @*             </div> *@
-                    @*             <div class="text-truncate">Anna Bridges: Hey, Maher! How are you? The weather is great isn't it?</div> *@
-                    @*         </div> *@
-                    @*     </div> *@
-                    @* </li> *@
-                    @* <li> *@
-                    @*     <div class="media p-2"> *@
-                    @*         <div class="profile-avatar mr-2"> *@
-                    @*             <img class="avatar-img" src="https://themes.2the.me/Messenger-1.1/assets/images/avatars/10.jpg" alt="Bootstrap Themes"> *@
-                    @*         </div> *@
-                    @* *@
-                    @*         <div class="media-body overflow-hidden"> *@
-                    @*             <div class="d-flex mb-1"> *@
-                    @*                 <h6 class="text-truncate mb-0 mr-auto">Bootstrap Themes</h6> *@
-                    @*                 <p class="small text-muted text-nowrap ml-4">10:42 am</p> *@
-                    @*             </div> *@
-                    @*             <div class="text-truncate">Anna Bridges: Hey, Maher! How are you? The weather is great isn't it?</div> *@
-                    @*         </div> *@
-                    @*     </div> *@
-                    @* </li> *@
-                    @* <li> *@
-                    @*     <div class="media p-2"> *@
-                    @*         <div class="profile-avatar mr-2"> *@
-                    @*             <img class="avatar-img" src="https://themes.2the.me/Messenger-1.1/assets/images/avatars/7.jpg" alt="Bootstrap Themes"> *@
-                    @*         </div> *@
-                    @* *@
-                    @*         <div class="media-body overflow-hidden"> *@
-                    @*             <div class="d-flex mb-1"> *@
-                    @*                 <h6 class="text-truncate mb-0 mr-auto">Bootstrap Themes</h6> *@
-                    @*                 <p class="small text-muted text-nowrap ml-4">10:42 am</p> *@
-                    @*             </div> *@
-                    @*             <div class="text-truncate">Anna Bridges: Hey, Maher! How are you? The weather is great isn't it?</div> *@
-                    @*         </div> *@
-                    @*     </div> *@
-                    @* </li> *@
-                    @* <li> *@
-                    @*     <div class="media p-2"> *@
-                    @*         <div class="profile-avatar mr-2"> *@
-                    @*             <img class="avatar-img" src="https://themes.2the.me/Messenger-1.1/assets/images/avatars/8.jpg" alt="Bootstrap Themes"> *@
-                    @*         </div> *@
-                    @* *@
-                    @*         <div class="media-body overflow-hidden"> *@
-                    @*             <div class="d-flex mb-1"> *@
-                    @*                 <h6 class="text-truncate mb-0 mr-auto">Bootstrap Themes</h6> *@
-                    @*                 <p class="small text-muted text-nowrap ml-4">10:42 am</p> *@
-                    @*             </div> *@
-                    @*             <div class="text-truncate">Anna Bridges: Hey, Maher! How are you? The weather is great isn't it?</div> *@
-                    @*         </div> *@
-                    @*     </div> *@
-                    @* </li> *@
-                    @* <li> *@
-                    @*     <div class="media p-2"> *@
-                    @*         <div class="profile-avatar mr-2"> *@
-                    @*             <img class="avatar-img" src="https://themes.2the.me/Messenger-1.1/assets/images/avatars/9.jpg" alt="Bootstrap Themes"> *@
-                    @*         </div> *@
-                    @* *@
-                    @*         <div class="media-body overflow-hidden"> *@
-                    @*             <div class="d-flex mb-1"> *@
-                    @*                 <h6 class="text-truncate mb-0 mr-auto">Bootstrap Themes</h6> *@
-                    @*                 <p class="small text-muted text-nowrap ml-4">10:42 am</p> *@
-                    @*             </div> *@
-                    @*             <div class="text-truncate">Anna Bridges: Hey, Maher! How are you? The weather is great isn't it?</div> *@
-                    @*         </div> *@
-                    @*     </div> *@
-                    @* </li> *@
                 </ul>
             </div>
             <form class="form-inline">

@@ -34,6 +34,8 @@ namespace WebChatSignalr.ViewModels
         {
             Messages = new List<MessageViewModel>();
         }
+
+        public string Id { get; set; }
         public PersonViewModel Sender { get; set; }
         public PersonViewModel Recipient { get; set; }
         public List<MessageViewModel> Messages { get; set; }
