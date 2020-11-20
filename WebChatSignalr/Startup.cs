@@ -36,7 +36,10 @@ namespace WebChatSignalr
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
             services.AddRazorPages();
-            services.AddSignalR();
+            services.AddSignalR(options => 
+                 { 
+                     options.EnableDetailedErrors = true; 
+                 });
             services.Configure<IdentityOptions>(options =>
             {
                 // Default Password settings.

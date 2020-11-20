@@ -139,7 +139,8 @@
                         </button>
                     </div>
                     <textarea id="messageInput" type="text" rows="1" class="form-control" placeholder="Type your message..."></textarea>
-                    <input id="userInput" type="hidden" name="name" value="ali" />
+                    <input id="userInput" type="hidden" asp-for="Conversation.Recipient.Id" />
+                    <input id="conversationInput" type="hidden" asp-for="Conversation.Id" />
                     <div class="input-group-append">
                         <button class="btn btn-search-ico bg-white ">
                             <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-emoji-smile" fill="currentColor" xmlns="http://www.w3.org/2000/svg">

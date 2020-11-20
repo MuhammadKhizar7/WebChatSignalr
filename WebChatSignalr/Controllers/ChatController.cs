@@ -25,6 +25,11 @@ namespace WebChatSignalr.Controllers
         public async Task<IActionResult> Index(int? id)
         {
             var loginUserId = Convert.ToInt32(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            if (id !=null && id==loginUserId)
+            {
+                id = null;
+                return RedirectToActionPermanent(nameof(Index), new { id = id });
+            }
             var connectedRooms = await _dbContext.Rooms
                 .Include(x => x.User)
                 .Include(x => x.Creator)
