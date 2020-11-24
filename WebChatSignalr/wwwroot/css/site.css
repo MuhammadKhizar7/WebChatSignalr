@@ -42,6 +42,7 @@ for details on configuring this project to bundle and minify static web assets. 
 /*   border-bottom: 1px solid #e5e5e5; */
 /* } */
 /* */
+
 .box-shadow {
   box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
 }
@@ -93,7 +94,7 @@ for details on configuring this project to bundle and minify static web assets. 
 }
 
 .badge-top-right {
-    top: 0;
+    top: 5px;
     right: 0;
     -webkit-transform: translate(25%,-25%);
     -ms-transform: translate(25%,-25%);
@@ -115,6 +116,12 @@ for details on configuring this project to bundle and minify static web assets. 
     position: absolute;
     z-index: 1;
 }
+.inset-0 {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+}
 
 .mb-n6, .my-n6 {
     margin-bottom: -1.25rem !important;
@@ -123,7 +130,8 @@ for details on configuring this project to bundle and minify static web assets. 
 .badge-primary {
     color: #fff;
     /* background-color: #0176ff; */
-    background-color: #31d0d0;
+    /* background-color: #31d0d0; */
+    background-color: gold;
 }
 .btn-search-ico {
     color: rgba(33,37,41,.35);

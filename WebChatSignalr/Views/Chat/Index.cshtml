@@ -27,28 +27,27 @@
             <ul class="list-group">
                 @foreach (var room in Model.Rooms)
                 {
-                    <a asp-controller="Chat" asp-action="Index" asp-route-id="@room.Sender.Id" class="list-group-item list-group-item-action user-link @(routeId.Equals(room.Sender.Id.ToString())?"active text-white":"")">
-
+                    <li class="list-group-item list-group-item-action user-link  @(routeId.Equals(room.Sender.Id.ToString()) ? "active text-white" : "")" data-roomId="@room.Id", data-userId="@room.Sender.Id">
+                        <a asp-controller="Chat" asp-action="Index" asp-route-id="@room.Sender.Id" class="position-absolute inset-0 "> </a>
                         <div class="media">
                             <div class="profile-avatar mr-2">
                                 <img class="avatar-img" src="@room.Sender.Avatar" alt="@room.Sender.Name">
                             </div>
-
-                            <div class="media-body overflow-hidden">
+                            <div class="media-body overflow-hidden pt-1">
                                 <div class="d-flex mb-1">
                                     <h6 class="text-truncate mb-0 mr-auto username">@room.Sender.Name</h6>
-                                    <p class="small text-nowrap ml-4">@room.UpdatedDate.ToShortTimeString()</p>
+                                    <p class="small text-nowrap last-updated" datetime="@room.UpdatedDate"></p>
                                 </div>
-                                <div class="text-truncate">@room.Excerpt</div>
+                                <div class="text-truncate last-msg">@room.Excerpt</div>
                             </div>
                         </div>
-                        @if (room.UnreadCount>0)
-                        {
-                            <div class="badge badge-circle badge-primary badge-border-light badge-top-right">
-                                <span>@room.UnreadCount</span>
-                            </div>
+                        @if (room.UnreadCount > 0 )
+                        { 
+                                 <div class="badge badge-circle badge-primary badge-border-light badge-top-right unread-count">
+                                     <span>@room.UnreadCount</span>
+                                 </div>
                         }
-                    </a>
+                    </li>
                 }
             </ul>
         </div>
@@ -98,12 +97,12 @@
                                         <img class="avatar-img" src="@Model.Conversation.Sender.Avatar" alt="@Model.Conversation.Sender.Name">
                                     </div>
 
-                                    <div class="media-body overflow-hidden">
+                                    <div class="media-body">
                                         <div class="d-flex mb-1">
                                             <h6 class="text-truncate mb-0 mr-auto">@Model.Conversation.Sender.Name</h6>
-                                            <p class="small text-muted text-nowrap ml-4">@message.Timestamp</p>
+                                            <p class="small text-muted text-nowrap last-updated" datetime="@message.Timestamp"></p>
                                         </div>
-                                        <div class="text-wrap text-break">@message.Content</div>
+                                        <div class="text-wrap text-break " style="white-space: pre-line">@message.Content</div>
                                     </div>
                                 </div>
                             </li>
@@ -116,10 +115,10 @@
                                         <img class="avatar-img" src="@Model.Conversation.Recipient.Avatar" alt="@Model.Conversation.Recipient.Name">
                                     </div>
 
-                                    <div class="media-body overflow-hidden">
+                                    <div class="media-body">
                                         <div class="d-flex mb-1">
                                             <h6 class="text-truncate mb-0 mr-auto">@Model.Conversation.Recipient.Name</h6>
-                                            <p class="small text-muted text-nowrap ml-4">@message.Timestamp</p>
+                                            <p class="small text-muted text-nowrap last-updated" datetime="@message.Timestamp"></p>
                                         </div>
                                         <div class="text-wrap text-break">@message.Content</div>
                                     </div>

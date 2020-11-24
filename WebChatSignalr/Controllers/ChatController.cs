@@ -4,8 +4,10 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using WebChatSignalr.Data;
+using WebChatSignalr.Hubs;
 using WebChatSignalr.Models;
 using WebChatSignalr.ViewModels;
 
@@ -15,10 +17,11 @@ namespace WebChatSignalr.Controllers
     public class ChatController : Controller
     {
         private readonly ApplicationDbContext _dbContext;
-
-        public ChatController(ApplicationDbContext dbContext)
+        private readonly IHubContext<ChatHub> _hubContext;
+        public ChatController(ApplicationDbContext dbContext, IHubContext<ChatHub> hubContext)
         {
             _dbContext = dbContext;
+            _hubContext = hubContext;
         }
 
         // GET
@@ -144,7 +147,40 @@ namespace WebChatSignalr.Controllers
 
             return View(chat);
         }
+        [HttpPut]
+        public async Task<Boolean> ReadMessage([FromBody]int conversationId)
+        {
+            var loginUserId = Convert.ToInt32(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var room = await _dbContext.Rooms.FirstOrDefaultAsync(x => x.Id == conversationId &&
+                                                                       (x.UserId == loginUserId ||
+                                                                        x.CreatorId == loginUserId));
+            if (room != null)
+            {
+                room.UnreadCount = 0;
+                _dbContext.Rooms.Update(room);
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
 
+            return false;
+        }
+
+        [HttpPost]
+        public async Task<Message> SendMessage(Message message)
+        {
+
+            var sendMessage = new Message
+            {
+               Content = message.Content,
+               RoomId = message.RoomId,
+               Timestamp = DateTime.Now,
+               UserId = message.UserId
+            };
+            await _dbContext.Messages.AddAsync(sendMessage);
+            await _dbContext.SaveChangesAsync();
+            await _hubContext.Clients.Groups(sendMessage.RoomId.ToString()).SendAsync("ReceiveMessage", sendMessage);
+            return sendMessage;
+        }
         [HttpPost]
         public async Task<Room> CreateRoom(Room room)
         {
