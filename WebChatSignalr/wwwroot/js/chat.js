@@ -31,7 +31,7 @@ connection.on("ReceiveMessage", function (userId, message, timestamp) {
                                     <h6 class="text-truncate mb-0 mr-auto">${name}</h6>
                                     <p class="small text-muted text-nowrap ml-4">${time}</p>
                                 </div>
-                                <div class="text-wrap text-break" >${msg}</div>
+                                <div class="text-wrap text-break p-1" >${msg}</div>
                             </div>
                         </div>
                     </li>`;
@@ -49,7 +49,7 @@ function showNotification(roomId, message) {
 //    console.log(roomEl);
     if (roomEl) {
         let unread = roomEl.querySelector(".unread-count");
-//        console.log(unread !== null);
+        console.log(unread);
         if (unread) {
             let count =parseInt(unread.textContent);
             count++;
@@ -60,7 +60,7 @@ function showNotification(roomId, message) {
             console.log("unread is null");
             roomEl.querySelector(".last-msg").innerText = message;
             roomEl.querySelector(".last-updated").innerText = timeago(new Date()-new Date());
-            let elStr ='<div class="badge badge-circle badge-primary badge-border-light badge-top-right"><span>1</span></div>';
+            let elStr ='<div class="badge badge-circle badge-primary badge-border-light badge-top-right unread-count"><span>1</span></div>';
             let div = document.createElement('div');
             div.innerHTML = elStr;
             console.log(div);
@@ -109,10 +109,12 @@ function sendMessage() {
     const message = document.getElementById("messageInput").value;
     const conversationId = document.getElementById("conversationInput").value;
     console.log(conversationId,userId, message);
-    connection.invoke("SendMessage",conversationId, userId, message).catch(function (err) {
+    if (message) {
+        connection.invoke("SendMessage",conversationId, userId, message).catch(function (err) {
        
-        return console.error(err.toString());
-    });
+            return console.error(err.toString());
+        });
+    }
     document.getElementById("messageInput").value = '';
 }
 

@@ -5,7 +5,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using WebChatSignalr.Data;
 using WebChatSignalr.Models;
 
@@ -22,29 +21,32 @@ namespace WebChatSignalr.Hubs
 
         public async Task SendMessage(string conversationId,string userId, string message)
         {
-            var room =await _db.Rooms.FirstOrDefaultAsync(x => x.Id == Convert.ToInt32(conversationId));
+            var roomId = Convert.ToInt32(conversationId);
+            var loginUserId = Convert.ToInt32(GetLoginUser());
+            var room =await _db.Rooms.FirstOrDefaultAsync(x => x.Id == roomId);
             if (room==null)
             {
-                return;
+                return; 
             }
 
             try
             {
                 room.UnreadCount += 1;
                 room.UpdatedDate= DateTime.Now;
+                room.UpdatedBy = loginUserId;
                 if (room.UserId != null)
                 {
                     var newMessage = new Message
                     {
                         Content = Regex.Replace(message, @"(?i)<(?!img|a|/a|/img).*?>", string.Empty),
-                        RoomId = Convert.ToInt32(conversationId),
-                        UserId = (int) room.UserId,
+                        RoomId = roomId,
+                        UserId = loginUserId,
                         Timestamp = DateTime.Now
                     };
                     room.Messages.Add(newMessage);
                     await _db.SaveChangesAsync();
                     await Clients.Group(conversationId).SendAsync("ReceiveMessage", newMessage.UserId, newMessage.Content, newMessage.Timestamp);
-                    var otherUser = Convert.ToInt32(GetLoginUser()) == room.UserId ? room.CreatorId : room.UserId;
+                    var otherUser = loginUserId == room.UserId ? room.CreatorId : room.UserId;
                     if (OnlineUser.TryGetValue(otherUser.ToString(), out string connectionId))
                     {
                         await SendNotification(connectionId, newMessage.RoomId.ToString(),

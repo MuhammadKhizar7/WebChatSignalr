@@ -33,15 +33,15 @@
                             <div class="profile-avatar mr-2">
                                 <img class="avatar-img" src="@room.Sender.Avatar" alt="@room.Sender.Name">
                             </div>
-                            <div class="media-body overflow-hidden pt-1">
+                            <div class="media-body overflow-hidden">
                                 <div class="d-flex mb-1">
                                     <h6 class="text-truncate mb-0 mr-auto username">@room.Sender.Name</h6>
                                     <p class="small text-nowrap last-updated" datetime="@room.UpdatedDate"></p>
                                 </div>
-                                <div class="text-truncate last-msg">@room.Excerpt</div>
+                                <div class="text-truncate last-msg p-1">@room.Excerpt</div>
                             </div>
                         </div>
-                        @if (room.UnreadCount > 0 )
+                        @if (room.UnreadCount > 0 && room.UpdateBy != room.Recipient.Id)
                         { 
                                  <div class="badge badge-circle badge-primary badge-border-light badge-top-right unread-count">
                                      <span>@room.UnreadCount</span>
@@ -73,7 +73,7 @@
                             <input type="hidden" asp-for="Conversation.Recipient.Name" />
                             <input type="hidden" asp-for="Conversation.Recipient.Avatar" />
                             <div class="dropdown">
-                                <a class="btn dropdown-toggle" type="button" id="chatdrop" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <a class="btn dropdown-toggle" id="chatdrop" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 </a>
                                 <div class="dropdown-menu" aria-labelledby="chatdrop">
                                     <a class="dropdown-item" href="#">🗑️ Delete Chat</a>
@@ -102,7 +102,7 @@
                                             <h6 class="text-truncate mb-0 mr-auto">@Model.Conversation.Sender.Name</h6>
                                             <p class="small text-muted text-nowrap last-updated" datetime="@message.Timestamp"></p>
                                         </div>
-                                        <div class="text-wrap text-break " style="white-space: pre-line">@message.Content</div>
+                                        <div class="text-wrap text-break p-1" style="white-space: pre-line">@message.Content</div>
                                     </div>
                                 </div>
                             </li>
@@ -120,7 +120,7 @@
                                             <h6 class="text-truncate mb-0 mr-auto">@Model.Conversation.Recipient.Name</h6>
                                             <p class="small text-muted text-nowrap last-updated" datetime="@message.Timestamp"></p>
                                         </div>
-                                        <div class="text-wrap text-break">@message.Content</div>
+                                        <div class="text-wrap text-break p-1">@message.Content</div>
                                     </div>
                                 </div>
                             </li>
@@ -136,21 +136,33 @@
                                 <path fill-rule="evenodd" d="M14.5 3h-13a.5.5 0 0 0-.5.5v9c0 .013 0 .027.002.04V12l2.646-2.354a.5.5 0 0 1 .63-.062l2.66 1.773 3.71-3.71a.5.5 0 0 1 .577-.094L15 9.499V3.5a.5.5 0 0 0-.5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13zm4.502 3.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
                             </svg>
                         </button>
+                        @* <input type="file" class="custom-file-input"/> *@
                     </div>
                     <textarea id="messageInput" type="text" rows="1" class="form-control" placeholder="Type your message..."></textarea>
                     <input id="userInput" type="hidden" asp-for="Conversation.Recipient.Id" />
                     <input id="conversationInput" type="hidden" asp-for="Conversation.Id" />
                     <div class="input-group-append">
-                        <button class="btn btn-search-ico bg-white ">
-                            <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-emoji-smile" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
-                                <path fill-rule="evenodd" d="M4.285 9.567a.5.5 0 0 1 .683.183A3.498 3.498 0 0 0 8 11.5a3.498 3.498 0 0 0 3.032-1.75.5.5 0 1 1 .866.5A4.498 4.498 0 0 1 8 12.5a4.498 4.498 0 0 1-3.898-2.25.5.5 0 0 1 .183-.683z" />
-                                <path d="M7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5zm4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5z" />
-                            </svg>
-                        </button>
-                        <button class="btn btn-search-ico bg-white " id="sendButton" value="Send Message">
+                        <div class="dropdown">
+                            <button class="btn btn-search-ico bg-white border-right-0 rounded-0" type="button" id="chatIcon" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-emoji-smile" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                    <path fill-rule="evenodd" d="M4.285 9.567a.5.5 0 0 1 .683.183A3.498 3.498 0 0 0 8 11.5a3.498 3.498 0 0 0 3.032-1.75.5.5 0 1 1 .866.5A4.498 4.498 0 0 1 8 12.5a4.498 4.498 0 0 1-3.898-2.25.5.5 0 0 1 .183-.683z"/>
+                                    <path d="M7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5zm4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5z"/>
+                                </svg>
+                            </button>
+                            <div class="dropdown-menu emoji-dropdown text-center" aria-labelledby="chatIcon">
+                                <a class="p-1" href="#"><img src="/images/emojis/emoji1.png"></a>
+                                <a class="p-1" href="#"><img src="/images/emojis/emoji2.png"></a>
+                                <a class="p-1" href="#"><img src="/images/emojis/emoji3.png"></a>
+                                <a class="p-1" href="#"><img src="/images/emojis/emoji4.png"></a>
+                                <a class="p-1" href="#"><img src="/images/emojis/emoji5.png"></a>
+                                <a class="p-1" href="#"><img src="/images/emojis/emoji6.png"></a>
+                                <a class="p-1" href="#"><img src="/images/emojis/emoji7.png"></a>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-search-ico bg-white" id="sendButton" value="Send Message">
                             <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-cursor" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" d="M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 0 0 1 .556.103zM2.25 8.184l3.897 1.67a.5.5 0 0 1 .262.263l1.67 3.897L12.743 3.52 2.25 8.184z" />
+                                <path fill-rule="evenodd" d="M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 0 0 1 .556.103zM2.25 8.184l3.897 1.67a.5.5 0 0 1 .262.263l1.67 3.897L12.743 3.52 2.25 8.184z"/>
                             </svg>
                         </button>
                     </div>

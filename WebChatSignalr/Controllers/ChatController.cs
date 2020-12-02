@@ -31,7 +31,7 @@ namespace WebChatSignalr.Controllers
             if (id !=null && id==loginUserId)
             {
                 id = null;
-                return RedirectToActionPermanent(nameof(Index), new { id = id });
+                return RedirectToActionPermanent(nameof(Index), new {id });
             }
             var connectedRooms = await _dbContext.Rooms
                 .Include(x => x.User)
@@ -52,7 +52,9 @@ namespace WebChatSignalr.Controllers
                         Name = x.UserId != null && x.UserId == loginUserId ? x.User.Name : x.Creator.Name,
                         Avatar = x.UserId != null && x.UserId == loginUserId ? x.User.Avatar : x.Creator.Avatar
                     },
+                    
                     UpdatedDate = x.UpdatedDate,
+                    UpdateBy = x.UpdatedBy,
                     UnreadCount = x.UnreadCount,
                     Excerpt = x.Messages.OrderByDescending(message => message.Timestamp).FirstOrDefault().Content
                 })
@@ -81,6 +83,7 @@ namespace WebChatSignalr.Controllers
                             Avatar = x.UserId != null && x.UserId == loginUserId ? x.User.Avatar : x.Creator.Avatar
                         },
                         UpdatedDate = x.UpdatedDate,
+                        UpdateBy = x.UpdatedBy,
                         UnreadCount = x.UnreadCount,
                         Excerpt = x.Messages.OrderByDescending(message => message.Timestamp).FirstOrDefault().Content
                     })
@@ -114,7 +117,8 @@ namespace WebChatSignalr.Controllers
                                 Name = x.UserId != null && x.UserId == loginUserId ? x.User.Name : x.Creator.Name,
                                 Avatar = x.UserId != null && x.UserId == loginUserId ? x.User.Avatar : x.Creator.Avatar
                             },
-                            UpdatedDate = x.UpdatedDate
+                            UpdatedDate = x.UpdatedDate,
+                            UpdateBy = x.UpdatedBy,
                         })
                         .FirstOrDefaultAsync(x => x.Id == newRoom.Id);
                     conversation.Id = currentRoom.Id.ToString();

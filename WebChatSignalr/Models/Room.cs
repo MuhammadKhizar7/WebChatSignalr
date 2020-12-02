@@ -16,7 +16,7 @@ namespace WebChatSignalr.Models
         public int? BlockedBy { get; set; }
         public int UnreadCount { get; set; }
         public DateTime UpdatedDate { get; set; }
-        // public int UpdatedBy { get; set; }
+        public int UpdatedBy { get; set; }
         public int? CreatorId { get; set; }
         public AppUser Creator { get; set; }
         public int? UserId { get; set; }

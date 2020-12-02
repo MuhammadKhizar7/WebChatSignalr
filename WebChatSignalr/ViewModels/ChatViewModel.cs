@@ -21,6 +21,7 @@ namespace WebChatSignalr.ViewModels
         public bool IsBlocked { get; set; }
         public bool IsReported { get; set; }
         public int? BlockedBy { get; set; }
+        public int UpdateBy { get; set; }
         public string Excerpt { get; set; }
         public PersonViewModel Sender { get; set; }
         public PersonViewModel Recipient { get; set; }
