@@ -100,7 +100,6 @@ for details on configuring this project to bundle and minify static web assets. 
     -ms-transform: translate(25%,-25%);
     transform: translate(25%,-25%);
 }
-
 .badge-circle {
     position: relative;
     -ms-border-radius: 50%;
@@ -111,7 +110,6 @@ for details on configuring this project to bundle and minify static web assets. 
     width: 1.75rem;
     min-width: 1.75rem;
 }
-
 .badge-bottom-center, .badge-bottom-left, .badge-bottom-right, .badge-top-center, .badge-top-left, .badge-top-right {
     position: absolute;
     z-index: 1;
@@ -146,6 +144,7 @@ for details on configuring this project to bundle and minify static web assets. 
 /* } */
 .chat-box {
     height: calc(100% - 100px);
+    will-change: transform
 }
 .chat-area, .chat-sidebar {
     height: calc(100vh - 80px) !important;
@@ -162,7 +161,7 @@ for details on configuring this project to bundle and minify static web assets. 
 .chat-pt {
     padding-top: 1.4rem !important;
 }
-a.active text-white-1 {
+a.active .text-white-1 {
     color: #ffffff;
 }
 .list-group-item.active {

@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using WebChatSignalr.Data;
 using WebChatSignalr.Hubs;
 using WebChatSignalr.Models;
+using WebChatSignalr.Utils.Helpers;
+using WebChatSignalr.Utils.Pagination;
 using WebChatSignalr.ViewModels;
 
 namespace WebChatSignalr.Controllers
@@ -25,8 +27,11 @@ namespace WebChatSignalr.Controllers
         }
 
         // GET
+        [Route("[Controller]/{id?}")]
         public async Task<IActionResult> Index(int? id)
         {
+            const int page = 1;
+            const int pageSize = 20;
             var loginUserId = Convert.ToInt32(User.FindFirstValue(ClaimTypes.NameIdentifier));
             if (id !=null && id==loginUserId)
             {
@@ -37,6 +42,7 @@ namespace WebChatSignalr.Controllers
                 .Include(x => x.User)
                 .Include(x => x.Creator)
                 .Where(x => (x.CreatorId == loginUserId || x.UserId == loginUserId) && !x.IsBlocked)
+                .OrderByDescending(x=>x.UpdatedDate)
                 .Select(x => new RoomViewModel
                 {
                     Id = x.Id,
@@ -58,8 +64,8 @@ namespace WebChatSignalr.Controllers
                     UnreadCount = x.UnreadCount,
                     Excerpt = x.Messages.OrderByDescending(message => message.Timestamp).FirstOrDefault().Content
                 })
-                .OrderBy(x => x.UpdatedDate)
-                .ToListAsync();
+                .OrderByDescending(x => x.UpdatedDate)
+                .GetPagedAsync(page, pageSize);
             var conversation = new ConversationViewModel();
             if (id != null && await _dbContext.Users.AnyAsync(x => x.Id == id))
             {
@@ -85,7 +91,7 @@ namespace WebChatSignalr.Controllers
                         UpdatedDate = x.UpdatedDate,
                         UpdateBy = x.UpdatedBy,
                         UnreadCount = x.UnreadCount,
-                        Excerpt = x.Messages.OrderByDescending(message => message.Timestamp).FirstOrDefault().Content
+                        Excerpt =x.Messages.OrderByDescending(message => message.Timestamp).FirstOrDefault().Content
                     })
                     .FirstOrDefaultAsync(x => x.Sender.Id == id);
                 if (currentRoom == null)
@@ -124,7 +130,7 @@ namespace WebChatSignalr.Controllers
                     conversation.Id = currentRoom.Id.ToString();
                     conversation.Sender = currentRoom.Sender;
                     conversation.Recipient = currentRoom.Recipient;
-                    connectedRooms.Insert(0, currentRoom);
+                    connectedRooms.Results.Insert(0, currentRoom);
                 }
                 else
                 {
@@ -133,16 +139,19 @@ namespace WebChatSignalr.Controllers
                     conversation.Sender = currentRoom.Sender;
                     conversation.Messages = await _dbContext.Messages
                         .Where(x => x.RoomId == currentRoom.Id)
+                        .OrderByDescending(x=>x.Timestamp)
                         .Select(x => new MessageViewModel
                         {
                             Id = x.RoomId,
                             Content = x.Content,
                             SenderId = x.UserId,
                             Timestamp = x.Timestamp
-                        }).ToListAsync();
+                        })
+                        .GetPagedAsync(page, pageSize);
                 }
             }
 
+            conversation.Messages.Results.Reverse();
             var chat = new ChatViewModel
             {
                 Rooms = connectedRooms,
@@ -198,6 +207,25 @@ namespace WebChatSignalr.Controllers
             await _dbContext.SaveChangesAsync();
             return roomx;
         }
+        
+        [HttpPost]
+        public async Task<ActionResult> BlockUser(int roomId)
+        {
+            var room = await _dbContext.Rooms.FirstOrDefaultAsync(x => x.Id == roomId);
+            if (room==null)
+            {
+                room.IsBlocked = true;
+                room.BlockedBy= Convert.ToInt32(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                room.UpdatedBy= Convert.ToInt32(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                room.UpdatedDate = DateTime.Now;
+                _dbContext.Rooms.Update(room);
+                await _dbContext.SaveChangesAsync();
+                return Ok(new { Success=true, Message="You block this conversation now this user cannot message you anymore"});
+            }
+
+            return BadRequest(new { Success=false, Message="You are not able to use this operation"});
+
+        }
 
         [HttpPost]
         public async Task<IActionResult> LeaveRoom(int roomId)
@@ -211,11 +239,31 @@ namespace WebChatSignalr.Controllers
             await _dbContext.SaveChangesAsync();
             return Json(room.Id);
         }
-
-        [HttpGet]
-        public async Task<IActionResult> LoadHistory(int roomId)
+        [HttpPost]
+        public async Task<IActionResult> DeleteChat(int roomId)
         {
-            var messages = await _dbContext.Messages.Where(x => x.RoomId == roomId).ToListAsync();
+            var room = new Room
+            {
+                Name = "NewRoom",
+                CreatorId = 1
+            };
+            _dbContext.Rooms.Remove(room);
+            await _dbContext.SaveChangesAsync();
+            return Json(room.Id);
+        }
+
+        [HttpGet("Chat/LoadHistory/{id}")]
+        public async Task<IActionResult> LoadHistory(int id, int page=1)
+        {
+            int pageSize = 20;
+            var messages = await _dbContext.Messages.Where(x => x.RoomId == id)
+                .Select(x=>new MessageViewModel
+                {
+                    Id = x.Id,
+                    Content = x.Content,
+                    Timestamp = x.Timestamp,
+                    SenderId = x.UserId
+                }).GetPagedAsync(page,pageSize);
             return Json(messages);
         }
     }

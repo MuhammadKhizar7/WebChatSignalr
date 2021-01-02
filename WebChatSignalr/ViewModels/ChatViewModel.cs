@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebChatSignalr.Models;
+using WebChatSignalr.Utils.Pagination;
 
 namespace WebChatSignalr.ViewModels
 {
@@ -10,10 +11,10 @@ namespace WebChatSignalr.ViewModels
     {
         public ChatViewModel()
         {
-            Rooms = new List<RoomViewModel>();
+            Rooms = new  PagedResult<RoomViewModel>();
             Conversation = new ConversationViewModel();
         }
-        public List<RoomViewModel> Rooms { get; set; }
+        public PagedResult<RoomViewModel> Rooms { get; set; }
         public ConversationViewModel Conversation { get; set; }
     }
     public class RoomViewModel{
@@ -33,13 +34,13 @@ namespace WebChatSignalr.ViewModels
     {
         public ConversationViewModel()
         {
-            Messages = new List<MessageViewModel>();
+            Messages = new PagedResult<MessageViewModel>();
         }
 
         public string Id { get; set; }
         public PersonViewModel Sender { get; set; }
         public PersonViewModel Recipient { get; set; }
-        public List<MessageViewModel> Messages { get; set; }
+        public PagedResult<MessageViewModel> Messages { get; set; }
     }
     public class MessageViewModel
     {

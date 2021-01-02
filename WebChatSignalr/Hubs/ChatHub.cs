@@ -5,8 +5,10 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using WebChatSignalr.Data;
 using WebChatSignalr.Models;
+using WebChatSignalr.Utils.Helpers;
 
 namespace WebChatSignalr.Hubs
 {
@@ -38,7 +40,7 @@ namespace WebChatSignalr.Hubs
                 {
                     var newMessage = new Message
                     {
-                        Content = Regex.Replace(message, @"(?i)<(?!img|a|/a|/img).*?>", string.Empty),
+                        Content = Regex.Replace(message.Trim(), @"(?i)<(?!img|a|/a|/img).*?>", string.Empty),
                         RoomId = roomId,
                         UserId = loginUserId,
                         Timestamp = DateTime.Now
@@ -52,13 +54,11 @@ namespace WebChatSignalr.Hubs
                         await SendNotification(connectionId, newMessage.RoomId.ToString(),
                             newMessage.Content);
                     }
-
-                  
                 }
             }
             catch (Exception e)
             {
-                await Clients.Caller.SendAsync("onError", "Message not send! Message should be 1-500 characters.");
+                await Clients.Caller.SendAsync("onError", "Message not send! Message should be 1-500 characters.", e);
             }
         }
 
@@ -95,7 +95,8 @@ namespace WebChatSignalr.Hubs
             await Groups.RemoveFromGroupAsync(
                 Context.ConnectionId, roomId);
         }
-        public async Task SendNotification(string userId, string roomId, string message)
+
+        private async Task SendNotification(string userId, string roomId, string message)
         {
             await Clients.Client(userId).SendAsync("Notification",roomId, message);
         }
