@@ -5,10 +5,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using WebChatSignalr.Data;
 using WebChatSignalr.Models;
-using WebChatSignalr.Utils.Helpers;
 
 namespace WebChatSignalr.Hubs
 {
@@ -103,7 +101,7 @@ namespace WebChatSignalr.Hubs
 
         private string GetLoginUser()
         {
-            return  Context.GetHttpContext().User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
+            return  Context.GetHttpContext().User.FindFirstValue(ClaimTypes.NameIdentifier);
         }
        
     }

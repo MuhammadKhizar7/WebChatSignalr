@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +21,7 @@ namespace WebChatSignalr.Controllers
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly IHubContext<ChatHub> _hubContext;
+
         public ChatController(ApplicationDbContext dbContext, IHubContext<ChatHub> hubContext)
         {
             _dbContext = dbContext;
@@ -32,17 +34,17 @@ namespace WebChatSignalr.Controllers
         {
             const int page = 1;
             const int pageSize = 20;
-            var loginUserId = Convert.ToInt32(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            if (id !=null && id==loginUserId)
+            var loginUserId = CurrentLoginUser();
+            if (id != null && id == loginUserId)
             {
                 id = null;
-                return RedirectToActionPermanent(nameof(Index), new {id });
+                return RedirectToActionPermanent(nameof(Index), new { id });
             }
-            var connectedRooms = await _dbContext.Rooms
-                .Include(x => x.User)
+
+            var connectedRooms = await _dbContext.Rooms.Include(x => x.User)
                 .Include(x => x.Creator)
-                .Where(x => (x.CreatorId == loginUserId || x.UserId == loginUserId) && !x.IsBlocked)
-                .OrderByDescending(x=>x.UpdatedDate)
+                .Where(x => (x.CreatorId == loginUserId || x.UserId == loginUserId))
+                .OrderByDescending(x => x.UpdatedDate)
                 .Select(x => new RoomViewModel
                 {
                     Id = x.Id,
@@ -58,7 +60,6 @@ namespace WebChatSignalr.Controllers
                         Name = x.UserId != null && x.UserId == loginUserId ? x.User.Name : x.Creator.Name,
                         Avatar = x.UserId != null && x.UserId == loginUserId ? x.User.Avatar : x.Creator.Avatar
                     },
-                    
                     UpdatedDate = x.UpdatedDate,
                     UpdateBy = x.UpdatedBy,
                     UnreadCount = x.UnreadCount,
@@ -69,10 +70,9 @@ namespace WebChatSignalr.Controllers
             var conversation = new ConversationViewModel();
             if (id != null && await _dbContext.Users.AnyAsync(x => x.Id == id))
             {
-                var currentRoom = await _dbContext.Rooms
-                    .Include(x => x.User)
+                var currentRoom = await _dbContext.Rooms.Include(x => x.User)
                     .Include(x => x.Creator)
-                    .Where(x => (x.CreatorId == loginUserId || x.UserId == loginUserId) && !x.IsBlocked)
+                    .Where(x => (x.CreatorId == loginUserId || x.UserId == loginUserId))
                     .Select(x => new RoomViewModel
                     {
                         Id = x.Id,
@@ -80,33 +80,36 @@ namespace WebChatSignalr.Controllers
                         {
                             Id = x.UserId != null && x.UserId != loginUserId ? x.UserId : x.CreatorId,
                             Name = x.UserId != null && x.UserId != loginUserId ? x.User.Name : x.Creator.Name,
-                            Avatar = x.UserId != null && x.UserId != loginUserId ? x.User.Avatar : x.Creator.Avatar
+                            Avatar = x.UserId != null && x.UserId != loginUserId
+                                ? x.User.Avatar
+                                : x.Creator.Avatar
                         },
                         Recipient = new PersonViewModel
                         {
                             Id = x.UserId != null && x.UserId == loginUserId ? x.UserId : x.CreatorId,
                             Name = x.UserId != null && x.UserId == loginUserId ? x.User.Name : x.Creator.Name,
-                            Avatar = x.UserId != null && x.UserId == loginUserId ? x.User.Avatar : x.Creator.Avatar
+                            Avatar = x.UserId != null && x.UserId == loginUserId
+                                ? x.User.Avatar
+                                : x.Creator.Avatar
                         },
                         UpdatedDate = x.UpdatedDate,
                         UpdateBy = x.UpdatedBy,
                         UnreadCount = x.UnreadCount,
-                        Excerpt =x.Messages.OrderByDescending(message => message.Timestamp).FirstOrDefault().Content
+                        BlockedBy = x.BlockedBy,
+                        IsBlocked = x.IsBlocked,
+                        IsReported = x.IsReported,
+                        Excerpt = x.Messages.OrderByDescending(message => message.Timestamp)
+                            .FirstOrDefault()
+                            .Content
                     })
                     .FirstOrDefaultAsync(x => x.Sender.Id == id);
                 if (currentRoom == null)
                 {
-                    var newRoom = new Room
-                    {
-                        CreatorId = loginUserId,
-                        UserId = id,
-                        UpdatedDate = DateTime.Now
-                    };
+                    var newRoom = new Room { CreatorId = loginUserId, UserId = id, UpdatedDate = DateTime.Now };
                     await _dbContext.Rooms.AddAsync(newRoom);
                     await _dbContext.SaveChangesAsync();
 
-                    currentRoom = await _dbContext.Rooms
-                        .Include(x => x.User)
+                    currentRoom = await _dbContext.Rooms.Include(x => x.User)
                         .Include(x => x.Creator)
                         .Select(x => new RoomViewModel
                         {
@@ -114,14 +117,22 @@ namespace WebChatSignalr.Controllers
                             Sender = new PersonViewModel
                             {
                                 Id = x.UserId != null && x.UserId != loginUserId ? x.UserId : x.CreatorId,
-                                Name = x.UserId != null && x.UserId != loginUserId ? x.User.Name : x.Creator.Name,
-                                Avatar = x.UserId != null && x.UserId != loginUserId ? x.User.Avatar : x.Creator.Avatar
+                                Name = x.UserId != null && x.UserId != loginUserId
+                                    ? x.User.Name
+                                    : x.Creator.Name,
+                                Avatar = x.UserId != null && x.UserId != loginUserId
+                                    ? x.User.Avatar
+                                    : x.Creator.Avatar
                             },
                             Recipient = new PersonViewModel
                             {
                                 Id = x.UserId != null && x.UserId == loginUserId ? x.UserId : x.CreatorId,
-                                Name = x.UserId != null && x.UserId == loginUserId ? x.User.Name : x.Creator.Name,
-                                Avatar = x.UserId != null && x.UserId == loginUserId ? x.User.Avatar : x.Creator.Avatar
+                                Name = x.UserId != null && x.UserId == loginUserId
+                                    ? x.User.Name
+                                    : x.Creator.Name,
+                                Avatar = x.UserId != null && x.UserId == loginUserId
+                                    ? x.User.Avatar
+                                    : x.Creator.Avatar
                             },
                             UpdatedDate = x.UpdatedDate,
                             UpdateBy = x.UpdatedBy,
@@ -135,14 +146,16 @@ namespace WebChatSignalr.Controllers
                 else
                 {
                     conversation.Id = currentRoom.Id.ToString();
+                    conversation.IsBlocked = currentRoom.IsBlocked;
+                    conversation.IsReported = currentRoom.IsReported;
+                    conversation.BlockedBy = currentRoom.BlockedBy;
                     conversation.Recipient = currentRoom.Recipient;
                     conversation.Sender = currentRoom.Sender;
-                    conversation.Messages = await _dbContext.Messages
-                        .Where(x => x.RoomId == currentRoom.Id)
-                        .OrderByDescending(x=>x.Timestamp)
+                    conversation.Messages = await _dbContext.Messages.Where(x => x.RoomId == currentRoom.Id)
+                        .OrderByDescending(x => x.Timestamp)
                         .Select(x => new MessageViewModel
                         {
-                            Id = x.RoomId,
+                            Id = x.Id,
                             Content = x.Content,
                             SenderId = x.UserId,
                             Timestamp = x.Timestamp
@@ -152,119 +165,115 @@ namespace WebChatSignalr.Controllers
             }
 
             conversation.Messages.Results.Reverse();
-            var chat = new ChatViewModel
-            {
-                Rooms = connectedRooms,
-                Conversation = conversation
-            };
+            var chat = new ChatViewModel { Rooms = connectedRooms, Conversation = conversation };
 
             return View(chat);
         }
+
         [HttpPut]
-        public async Task<Boolean> ReadMessage([FromBody]int conversationId)
+        public async Task<bool> ReadMessage([FromBody] int conversationId)
         {
-            var loginUserId = Convert.ToInt32(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var loginUserId = CurrentLoginUser();
             var room = await _dbContext.Rooms.FirstOrDefaultAsync(x => x.Id == conversationId &&
                                                                        (x.UserId == loginUserId ||
                                                                         x.CreatorId == loginUserId));
-            if (room != null)
-            {
-                room.UnreadCount = 0;
-                _dbContext.Rooms.Update(room);
-                await _dbContext.SaveChangesAsync();
-                return true;
-            }
+            if (room == null) return false;
+            room.UnreadCount = 0;
+            _dbContext.Rooms.Update(room);
+            await _dbContext.SaveChangesAsync();
+            return true;
 
-            return false;
         }
 
         [HttpPost]
         public async Task<Message> SendMessage(Message message)
         {
-
             var sendMessage = new Message
             {
-               Content = message.Content,
-               RoomId = message.RoomId,
-               Timestamp = DateTime.Now,
-               UserId = message.UserId
+                Content = message.Content,
+                RoomId = message.RoomId,
+                Timestamp = DateTime.Now,
+                UserId = message.UserId
             };
             await _dbContext.Messages.AddAsync(sendMessage);
             await _dbContext.SaveChangesAsync();
             await _hubContext.Clients.Groups(sendMessage.RoomId.ToString()).SendAsync("ReceiveMessage", sendMessage);
             return sendMessage;
         }
-        [HttpPost]
-        public async Task<Room> CreateRoom(Room room)
-        {
-            var roomx = new Room
-            {
-                Name = "NewRoom",
-                CreatorId = 1,
-                UserId = 2
-            };
-            await _dbContext.Rooms.AddAsync(roomx);
-            await _dbContext.SaveChangesAsync();
-            return roomx;
-        }
-        
-        [HttpPost]
-        public async Task<ActionResult> BlockUser(int roomId)
+
+        // [HttpPost]
+        // public async Task<Room> CreateRoom(Room room)
+        // {
+        //     var roomx = new Room {Name = "NewRoom", CreatorId = 1, UserId = 2};
+        //     await _dbContext.Rooms.AddAsync(roomx);
+        //     await _dbContext.SaveChangesAsync();
+        //     return roomx;
+        // }
+
+        [HttpPost("[Controller]/[Action]/{roomId}")]
+        public async Task<ActionResult> BlockUser(int roomId, bool isReported = false)
         {
             var room = await _dbContext.Rooms.FirstOrDefaultAsync(x => x.Id == roomId);
-            if (room==null)
-            {
-                room.IsBlocked = true;
-                room.BlockedBy= Convert.ToInt32(User.FindFirstValue(ClaimTypes.NameIdentifier));
-                room.UpdatedBy= Convert.ToInt32(User.FindFirstValue(ClaimTypes.NameIdentifier));
-                room.UpdatedDate = DateTime.Now;
-                _dbContext.Rooms.Update(room);
-                await _dbContext.SaveChangesAsync();
-                return Ok(new { Success=true, Message="You block this conversation now this user cannot message you anymore"});
-            }
-
-            return BadRequest(new { Success=false, Message="You are not able to use this operation"});
-
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> LeaveRoom(int roomId)
-        {
-            var room = new Room
-            {
-                Name = "NewRoom",
-                CreatorId = 1
-            };
-            _dbContext.Rooms.Remove(room);
+            if (room == null)
+                return BadRequest(new { Success = false, Message = "You are not able to use this operation" });
+            room.IsBlocked = !room.IsBlocked;
+            room.IsReported = isReported && room.IsBlocked;
+            room.BlockedBy = room.IsBlocked ? CurrentLoginUser() : 0;
+            room.UpdatedBy = CurrentLoginUser();
+            _dbContext.Rooms.Update(room);
             await _dbContext.SaveChangesAsync();
-            return Json(room.Id);
+            return Ok(new
+            {
+                Success = true,
+                Message = "You block this conversation now this user cannot message you anymore"
+            });
         }
+
         [HttpPost]
         public async Task<IActionResult> DeleteChat(int roomId)
         {
-            var room = new Room
-            {
-                Name = "NewRoom",
-                CreatorId = 1
-            };
+            var room = await _dbContext.Rooms.Where(x => x.Id == roomId).FirstOrDefaultAsync();
             _dbContext.Rooms.Remove(room);
             await _dbContext.SaveChangesAsync();
-            return Json(room.Id);
+            return Ok(room.Id);
         }
 
-        [HttpGet("Chat/LoadHistory/{id}")]
-        public async Task<IActionResult> LoadHistory(int id, int page=1)
+        [HttpGet("[Controller]/[Action]/{id}")]
+        public async Task<IActionResult> LoadHistory(int id, int page = 1)
         {
-            int pageSize = 20;
+            var pageSize = 20;
             var messages = await _dbContext.Messages.Where(x => x.RoomId == id)
-                .Select(x=>new MessageViewModel
+                .Select(x => new MessageViewModel
                 {
                     Id = x.Id,
                     Content = x.Content,
                     Timestamp = x.Timestamp,
                     SenderId = x.UserId
-                }).GetPagedAsync(page,pageSize);
-            return Json(messages);
+                })
+                .OrderByDescending(x => x.Timestamp)
+                .GetPagedAsync(page, pageSize);
+            return Ok(messages);
+        }
+        [HttpGet("[Controller]/[Action]/{id}")]
+        public async Task<IActionResult> GetChatUser(int id)
+        {
+            var room =await _dbContext.Rooms.Include(x=>x.User).Include(x=>x.Creator).Select(x=> new RoomViewModel
+            {
+                Id = x.Id,
+                Sender = new PersonViewModel
+                {
+                    Id = x.User.Id!=CurrentLoginUser()? x.User.Id : x.Creator.Id,
+                    Name = x.User.Id!=CurrentLoginUser()? x.User.Name : x.Creator.Name,
+                    Avatar = x.User.Id!=CurrentLoginUser()? x.User.Avatar : x.Creator.Avatar,
+                }
+    
+            }).FirstOrDefaultAsync(r => r.Id == id);
+            return Ok(room.Sender);
+        }
+
+        private int CurrentLoginUser()
+        {
+            return Convert.ToInt32(User.FindFirstValue(ClaimTypes.NameIdentifier));
         }
     }
 }

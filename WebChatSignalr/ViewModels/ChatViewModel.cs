@@ -38,6 +38,9 @@ namespace WebChatSignalr.ViewModels
         }
 
         public string Id { get; set; }
+        public bool IsBlocked { get; set; }
+        public bool IsReported { get; set; }
+        public int? BlockedBy { get; set; }
         public PersonViewModel Sender { get; set; }
         public PersonViewModel Recipient { get; set; }
         public PagedResult<MessageViewModel> Messages { get; set; }

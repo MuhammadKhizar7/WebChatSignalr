@@ -156,7 +156,6 @@ for details on configuring this project to bundle and minify static web assets. 
 }
 .emoji-dropdown {
     min-width: 6rem !important;
-    height: 4rem !important;
 }
 .chat-pt {
     padding-top: 1.4rem !important;
@@ -167,4 +166,7 @@ a.active .text-white-1 {
 .list-group-item.active {
     background-color: #1bdfbb;
     border-color: #1bdfa8;
+}
+.cursor-pointer{
+    cursor: pointer;
 }
