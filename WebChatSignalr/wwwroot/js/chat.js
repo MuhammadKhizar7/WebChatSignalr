@@ -61,7 +61,7 @@ function newShowNotification(roomId, message) {
                                <a class="position-absolute inset-0 " href="/Chat/${id}"> </a>
                                <div class="media">
                                    <div class="profile-avatar mr-2">
-                                       <img class="avatar-img" src="${avatar}" >
+                                       <img class="avatar-img" src="/images/${avatar}" >
                                    </div>
                                    <div class="media-body overflow-hidden">
                                        <div class="d-flex mb-1">
@@ -256,7 +256,7 @@ function renderMessage(userId, message, timestamp, callback) {
   let encodedMsg = `<li>
                         <div class="media p-2">
                             <div class="profile-avatar mr-2">
-                                <img class="avatar-img" src="${avatar}" alt="${name}">
+                                <img class="avatar-img" src="/images/${avatar}" >
                             </div>
 
                             <div class="media-body overflow-hidden">

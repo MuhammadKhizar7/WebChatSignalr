@@ -29,7 +29,7 @@
                         <a asp-controller="Chat" asp-action="Index" asp-route-id="@room.Sender.Id" class="position-absolute inset-0 "> </a>
                         <div class="media">
                             <div class="profile-avatar mr-2">
-                                <img class="avatar-img" src="@room.Sender.Avatar" alt="@room.Sender.Name">
+                                <img class="avatar-img" src="/images/@room.Sender.Avatar" alt="avatar">
                             </div>
                             <div class="media-body overflow-hidden">
                                 <div class="d-flex mb-1">
@@ -59,7 +59,7 @@
         <div class="border-bottom p-1">
             <div class="media">
                 <div class="profile-avatar mr-2">
-                    <img class="avatar-img" src="@Model.Conversation.Sender.Avatar" alt="@Model.Conversation.Sender.Name">
+                    <img class="avatar-img" src="/images/@Model.Conversation.Sender.Avatar" alt="avatar">
                 </div>
                 <div class="media-body">
                     <div class="d-flex mb-1">
@@ -79,13 +79,13 @@
         </div>
         <div id="chat-box" class="chat-box  bg-white d-flex flex-column-reverse  @(Model.Conversation.IsBlocked ? "overflow-hidden" : "overflow-auto")">
             <ul id="messagesList" class="list-unstyled">
-                <div id="chat-blocker" class="modal-backdrop show w-100 h-100 text-center p-5 @(Model.Conversation.IsBlocked ? "" : "d-none")">
+                <li id="chat-blocker" class="modal-backdrop show w-100 h-100 text-center p-5 @(Model.Conversation.IsBlocked ? "" : "d-none")">
                     <div>
                         <div class="display-1">🚫</div>
                         <h4 class="text-white">User blocked</h4>
                         <h6 class="text-white">You're no longer able to send messages</h6>
                     </div>
-                </div>
+                </li>
                 <li id="load-more" class="d-flex justify-content-center">
                     <div class="spinner-border d-none" role="status">
                         <span class="sr-only">Loading...</span>
@@ -98,7 +98,7 @@
                         <li>
                             <div class="media p-2">
                                 <div class="profile-avatar mr-2">
-                                    <img class="avatar-img" src="@Model.Conversation.Sender.Avatar" alt="@Model.Conversation.Sender.Name">
+                                    <img class="avatar-img" src="/images/@Model.Conversation.Sender.Avatar" alt="avatar">
                                 </div>
 
                                 <div class="media-body">
@@ -116,7 +116,7 @@
                         <li>
                             <div class="media p-2">
                                 <div class="profile-avatar mr-2">
-                                    <img class="avatar-img" src="@Model.Conversation.Recipient.Avatar" alt="@Model.Conversation.Recipient.Name">
+                                    <img class="avatar-img" src="/images/@Model.Conversation.Recipient.Avatar" alt="avatar">
                                 </div>
 
                                 <div class="media-body">
