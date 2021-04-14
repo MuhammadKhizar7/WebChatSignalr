@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Pages\**" />
+    <Content Remove="Pages\**" />
+    <EmbeddedResource Remove="Pages\**" />
+    <None Remove="Pages\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Migrations\20201021143015_Initial.cs" />
     <Compile Remove="Migrations\20201021143015_Initial.Designer.cs" />
     <Compile Remove="Migrations\20201027175932_CreateUsersInRoom.cs" />
@@ -39,10 +46,6 @@
 
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Views\Rooms\Index.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Pages" />
   </ItemGroup>
 
 </Project>

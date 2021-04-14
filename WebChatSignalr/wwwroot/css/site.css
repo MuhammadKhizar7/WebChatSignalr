@@ -91,6 +91,7 @@ for details on configuring this project to bundle and minify static web assets. 
 
 .badge-border-light {
     border: 5px solid #f5f6fa;
+    /* border: 3px solid #f5f6fa; */
 }
 
 .badge-top-right {
@@ -109,6 +110,10 @@ for details on configuring this project to bundle and minify static web assets. 
     height: 1.75rem;
     width: 1.75rem;
     min-width: 1.75rem;
+    line-height: 1rem;
+    /* height: 1.2rem; */
+    /* width: 1.2rem; */
+    /* min-width: 1.2rem; */
 }
 .badge-bottom-center, .badge-bottom-left, .badge-bottom-right, .badge-top-center, .badge-top-left, .badge-top-right {
     position: absolute;
@@ -166,6 +171,10 @@ a.active .text-white-1 {
 .list-group-item.active {
     background-color: #1bdfbb;
     border-color: #1bdfa8;
+}
+.list-group-item {
+    padding: .5rem;
+    padding-right: 1.5rem;
 }
 .cursor-pointer{
     cursor: pointer;

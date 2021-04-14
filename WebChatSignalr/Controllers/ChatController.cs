@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Security.Claims;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using WebChatSignalr.Data;
 using WebChatSignalr.Hubs;
 using WebChatSignalr.Models;
-using WebChatSignalr.Utils.Helpers;
 using WebChatSignalr.Utils.Pagination;
 using WebChatSignalr.ViewModels;
 
