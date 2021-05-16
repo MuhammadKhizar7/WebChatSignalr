@@ -27,11 +27,11 @@
                 {
                     <li class="list-group-item list-group-item-action user-link  @(routeId.Equals(room.Sender.Id.ToString()) ? "active text-white" : "")" data-roomId="@room.Id" data-userId="@room.Sender.Id">
                         <a asp-controller="Chat" asp-action="Index" asp-route-id="@room.Sender.Id" class="position-absolute inset-0 "> </a>
-                        <div class="media">
+                        <div class="d-flex">
                             <div class="profile-avatar mr-2">
                                 <img class="avatar-img" src="/images/@room.Sender.Avatar" alt="avatar">
                             </div>
-                            <div class="media-body overflow-hidden">
+                            <div class="overflow-hidden w-100">
                                 <div class="d-flex mb-1">
                                     <h6 class="text-truncate mb-0 mr-auto username">@room.Sender.Name</h6>
                                     <p class="small text-nowrap last-updated" datetime="@room.UpdatedDate"></p>
@@ -57,15 +57,14 @@
 {
     <div class="chat-area col-md-7 px-1">
         <div class="border-bottom p-1">
-            <div class="media">
+            <div class="d-flex">
+            <a id="close-chat" href="#" class="h1 text-decoration-none d-sm-none">←</a>
                 <div class="profile-avatar mr-2">
                     <img class="avatar-img" src="/images/@Model.Conversation.Sender.Avatar" alt="avatar">
                 </div>
-                <div class="media-body">
-                    <div class="d-flex mb-1">
-                        <h6 class="text-truncate mb-0 mr-auto">@Model.Conversation.Sender.Name</h6>
+                        <h6 class="text-truncate mt-1 mr-auto">@Model.Conversation.Sender.Name</h6>
                         <div class="dropdown">
-                            <a class="btn dropdown-toggle" id="chat-drop" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <a class="btn dropdown-toggle upright" id="chat-drop" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             </a>
                             <div id="chat-dropdown" class="dropdown-menu" aria-labelledby="chat-drop">
                                 @* <a class="dropdown-item" href="#">🗑️ Delete Chat</a> *@
@@ -73,8 +72,6 @@
                                 <a class="dropdown-item" href="#">@(Model.Conversation.IsBlocked && Model.Conversation.IsReported && Model.Conversation.BlockedBy == Model.Conversation.Recipient.Id ? "☣️ Remove Report" : "☣️ Report User")</a>
                             </div>
                         </div>
-                    </div>
-                </div>
             </div>
         </div>
         <div id="chat-box" class="chat-box  bg-white d-flex flex-column-reverse  @(Model.Conversation.IsBlocked ? "overflow-hidden" : "overflow-auto")">
@@ -96,12 +93,12 @@
                     @if (Model.Conversation.Sender.Id == message.SenderId)
                     {
                         <li>
-                            <div class="media p-2">
+                            <div class="d-flex p-2">
                                 <div class="profile-avatar mr-2">
                                     <img class="avatar-img" src="/images/@Model.Conversation.Sender.Avatar" alt="avatar">
                                 </div>
 
-                                <div class="media-body">
+                                <div class="w-100">
                                     <div class="d-flex mb-1">
                                         <h6 class="text-truncate mb-0 mr-auto">@Model.Conversation.Sender.Name</h6>
                                         <p class="small text-muted text-nowrap last-updated" datetime="@message.Timestamp"></p>
@@ -114,12 +111,12 @@
                     else
                     {
                         <li>
-                            <div class="media p-2">
+                            <div class="d-flex p-2">
                                 <div class="profile-avatar mr-2">
                                     <img class="avatar-img" src="/images/@Model.Conversation.Recipient.Avatar" alt="avatar">
                                 </div>
 
-                                <div class="media-body">
+                                <div class="w-100">
                                     <div class="d-flex mb-1">
                                         <h6 class="text-truncate mb-0 mr-auto">@Model.Conversation.Recipient.Name</h6>
                                         <p class="small text-muted text-nowrap last-updated" datetime="@message.Timestamp"></p>
@@ -213,7 +210,7 @@ else
         </div>
     </div>
 }
-<div class="col-md-2 border"></div>
+<div class="col-md-2 border d-none d-sm-block"></div>
 </div>
 <script src="~/lib/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/chat.js"></script>

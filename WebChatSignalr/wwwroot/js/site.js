@@ -89,7 +89,7 @@ function convertToPakLocale(date) {
   } else {
     let s = date.split('/')
     let b = s[2].split(' ')
-    return b[0] + '/' + s[1] + '/' + s[0] + ' ' + b[1] + ' ' + b[2]
+    return b[0] + '/' + s[0] + '/' + s[1] + ' ' + b[1] + ' ' + b[2]
   }
 }
 
